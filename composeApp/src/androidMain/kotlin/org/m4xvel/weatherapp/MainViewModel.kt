@@ -1,4 +1,4 @@
-package org.m4xvel.weatherapp.ui
+package org.m4xvel.weatherapp
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf

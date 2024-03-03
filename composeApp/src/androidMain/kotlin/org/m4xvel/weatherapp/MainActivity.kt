@@ -1,4 +1,4 @@
-package org.m4xvel.weatherapp.ui
+package org.m4xvel.weatherapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

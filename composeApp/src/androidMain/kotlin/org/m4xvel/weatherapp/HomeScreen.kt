@@ -1,4 +1,4 @@
-package org.m4xvel.weatherapp.ui
+package org.m4xvel.weatherapp
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
