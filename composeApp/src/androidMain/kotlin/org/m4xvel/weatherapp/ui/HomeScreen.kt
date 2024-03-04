@@ -30,13 +30,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
-import org.m4xvel.weatherapp.domain.model.Weather
 
 @Composable
 fun HomeScreen() {
     MaterialTheme {
-        Box(
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Search()
             WeatherCard()
@@ -97,7 +98,14 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
 }
 
 @Composable
-private fun WeatherCard() {
+private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
+
+    val city by mainViewModel.city
+    val temp by mainViewModel.temp
+    val speed by mainViewModel.speed
+    val humidity by mainViewModel.humidity
+    val pressure by mainViewModel.pressure
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -108,9 +116,9 @@ private fun WeatherCard() {
                 .padding(horizontal = 10.dp),
             shape = RoundedCornerShape(30.dp),
             border = BorderStroke(1.dp, Color.Black),
-            ) {
+        ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                CityAndTemperature("Пенза", "47")
+                CityAndTemperature(city, temp)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,9 +126,9 @@ private fun WeatherCard() {
                         .padding(start = 30.dp),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    AdditionalInformation("скорость ветра:", 60, "м/c")
-                    AdditionalInformation("влажность:", 23, "%")
-                    AdditionalInformation("давление:", 780, "mmHg")
+                    AdditionalDoubleInformation("скорость ветра:", speed, "м/c")
+                    AdditionalIntInformation("влажность:", humidity, "%")
+                    AdditionalIntInformation("давление:", pressure, "mmHg")
                 }
             }
         }
@@ -128,7 +136,7 @@ private fun WeatherCard() {
 }
 
 @Composable
-private fun CityAndTemperature(city: String, temperature: String) {
+private fun CityAndTemperature(city: String, temperature: Int) {
     Row(
         modifier = Modifier.fillMaxWidth()
             .padding(top = 10.dp),
@@ -137,7 +145,7 @@ private fun CityAndTemperature(city: String, temperature: String) {
     ) {
         Text(
             text = "$city, ",
-            fontSize = 52.sp
+            fontSize = 48.sp
         )
         Text(
             "$temperature°",
@@ -147,7 +155,17 @@ private fun CityAndTemperature(city: String, temperature: String) {
 }
 
 @Composable
-private fun AdditionalInformation(optionName: String, value: Int, symbol: String) {
+private fun AdditionalDoubleInformation(optionName: String, value: Double, symbol: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "$optionName \t ${value}${symbol}")
+    }
+}
+
+@Composable
+private fun AdditionalIntInformation(optionName: String, value: Int, symbol: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically

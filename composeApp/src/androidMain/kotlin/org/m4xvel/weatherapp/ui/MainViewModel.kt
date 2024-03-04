@@ -13,7 +13,23 @@ import kotlin.math.roundToInt
 class MainViewModel(
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
+
     private val weatherRequest = WeatherRequest(53.12, 45.00)
+
+    private val _city = mutableStateOf("")
+    val city: State<String> = _city
+
+    private val _temp = mutableStateOf(0)
+    val temp: State<Int> = _temp
+
+    private val _speed = mutableStateOf(0.0)
+    val speed: State<Double> = _speed
+
+    private val _humidity = mutableStateOf(0)
+    val humidity: State<Int> = _humidity
+
+    private val _pressure = mutableStateOf(0)
+    val pressure: State<Int> = _pressure
 
     init {
         viewModelScope.launch {
@@ -22,6 +38,11 @@ class MainViewModel(
                 Log.d("MyTag", "\n Город: ${weather.name}, " +
                         "\n Температура: ${weather.temp.roundToInt()},\n Скорость ветра: ${weather.speed}," +
                         "\n Влажность: ${weather.humidity},\n Давление: ${weather.pressure} ")
+                _city.value = weather.name
+                _temp.value = weather.temp.roundToInt()
+                _speed.value = weather.speed
+                _humidity.value = weather.humidity
+                _pressure.value = weather.pressure
             } catch (e: Exception) {
                 Log.d("MyTag", "Error: ${e.localizedMessage}")
             }
