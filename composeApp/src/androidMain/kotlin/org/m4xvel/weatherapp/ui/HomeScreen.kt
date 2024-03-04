@@ -1,6 +1,11 @@
 package org.m4xvel.weatherapp.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.DefaultMarqueeIterations
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MarqueeAnimationMode
+import androidx.compose.foundation.MarqueeSpacing
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -135,6 +141,7 @@ private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CityAndTemperature(city: String, temperature: Int) {
     Row(
@@ -144,8 +151,14 @@ private fun CityAndTemperature(city: String, temperature: Int) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "$city, ",
-            fontSize = 48.sp
+            modifier = Modifier
+                .width(220.dp)
+                .basicMarquee(
+                    animationMode = MarqueeAnimationMode.Immediately,
+                    spacing = MarqueeSpacing(50.dp)
+            ),
+            text = "$city",
+            fontSize = 48.sp,
         )
         Text(
             "$temperature°",

@@ -6,7 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.m4xvel.weatherapp.data.remote.WeatherRequest
+import org.koin.androidx.compose.get
+import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
 import kotlin.math.roundToInt
 
@@ -14,7 +15,7 @@ class MainViewModel(
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
-    private val weatherRequest = WeatherRequest(53.12, 45.00)
+    private val geoRequest = GeoRequest("Penza")
 
     private val _city = mutableStateOf("")
     val city: State<String> = _city
@@ -34,7 +35,7 @@ class MainViewModel(
     init {
         viewModelScope.launch {
             try {
-                val weather = weatherRepository.getWeather(weatherRequest)
+                val weather = weatherRepository.getWeather(53.200001,45.0)
                 Log.d("MyTag", "\n Город: ${weather.name}, " +
                         "\n Температура: ${weather.temp.roundToInt()},\n Скорость ветра: ${weather.speed}," +
                         "\n Влажность: ${weather.humidity},\n Давление: ${weather.pressure} ")
@@ -43,6 +44,8 @@ class MainViewModel(
                 _speed.value = weather.speed
                 _humidity.value = weather.humidity
                 _pressure.value = weather.pressure
+                val cityName = weatherRepository.getCityName(geoRequest)
+                Log.d("MyTag", "${cityName.lat}, ${cityName.lon}")
             } catch (e: Exception) {
                 Log.d("MyTag", "Error: ${e.localizedMessage}")
             }

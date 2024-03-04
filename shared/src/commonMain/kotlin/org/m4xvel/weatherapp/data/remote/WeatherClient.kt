@@ -3,6 +3,10 @@ package org.m4xvel.weatherapp.data.remote
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
@@ -30,6 +34,15 @@ internal abstract class WeatherClient {
             path(path)
             parameter("appid", API_KEY)
             parameter("units", "metric")
+        }
+    }
+
+    fun HttpRequestBuilder.pathUrlForName(path: String) {
+        url {
+            protocol = URLProtocol.HTTPS
+            host = "api.openweathermap.org/geo/1.0"
+            path(path)
+            parameter("appid", API_KEY)
         }
     }
 }
