@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,6 +100,8 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
 
 @Composable
 private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
+
+    val state by mainViewModel.state.collectAsState()
 
     val city by mainViewModel.city
     val temp by mainViewModel.temp

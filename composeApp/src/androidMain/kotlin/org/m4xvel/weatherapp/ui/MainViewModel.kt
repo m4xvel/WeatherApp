@@ -5,16 +5,32 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.m4xvel.weatherapp.data.remote.WeatherRequest
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
 import kotlin.math.roundToInt
+
+data class WeatherState(
+    val city: String? = null,
+    val temp: Int? = null
+) {
+    val isLoading: Boolean
+        get() = city == null && temp == null
+
+
+}
 
 class MainViewModel(
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
     private val weatherRequest = WeatherRequest(53.12, 45.00)
+
+    private val _state = MutableStateFlow(WeatherState())
+    val state = _state.asStateFlow()
 
     private val _city = mutableStateOf("")
     val city: State<String> = _city
@@ -38,6 +54,14 @@ class MainViewModel(
                 Log.d("MyTag", "\n Город: ${weather.name}, " +
                         "\n Температура: ${weather.temp.roundToInt()},\n Скорость ветра: ${weather.speed}," +
                         "\n Влажность: ${weather.humidity},\n Давление: ${weather.pressure} ")
+
+                _state.update {
+                    it.copy(
+                        city = weather.name,
+
+                    )
+                }
+
                 _city.value = weather.name
                 _temp.value = weather.temp.roundToInt()
                 _speed.value = weather.speed
