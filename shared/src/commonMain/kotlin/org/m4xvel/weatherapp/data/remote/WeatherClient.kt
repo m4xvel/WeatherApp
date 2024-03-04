@@ -11,6 +11,8 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+private const val API_KEY = "22599d210f9ff6005c96992af90fd829"
+
 internal abstract class WeatherClient {
     val client = HttpClient {
         install(ContentNegotiation) {
@@ -26,6 +28,8 @@ internal abstract class WeatherClient {
             protocol = URLProtocol.HTTPS
             host = "api.openweathermap.org/data/2.5"
             path(path)
+            parameter("appid", API_KEY)
+            parameter("units", "metric")
         }
     }
 }

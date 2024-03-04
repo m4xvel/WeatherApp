@@ -1,4 +1,4 @@
-package org.m4xvel.weatherapp
+package org.m4xvel.weatherapp.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
+import org.m4xvel.weatherapp.domain.model.Weather
 
 @Composable
 fun HomeScreen() {
@@ -44,7 +45,7 @@ fun HomeScreen() {
 }
 
 @Composable
-private fun Search(mainViewModel: MainViewModel = viewModel()) {
+private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
     Card(
         modifier = Modifier
             .padding(horizontal = 10.dp, vertical = 20.dp)
@@ -107,10 +108,9 @@ private fun WeatherCard() {
                 .padding(horizontal = 10.dp),
             shape = RoundedCornerShape(30.dp),
             border = BorderStroke(1.dp, Color.Black),
-
             ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                CityAndTemperature("Пенза", "19")
+                CityAndTemperature("Пенза", "47")
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

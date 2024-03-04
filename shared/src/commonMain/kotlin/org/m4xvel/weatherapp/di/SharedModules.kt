@@ -5,7 +5,6 @@ import org.m4xvel.weatherapp.data.remote.RemoteDataSource
 import org.m4xvel.weatherapp.data.remote.WeatherService
 import org.m4xvel.weatherapp.data.repository.WeatherRepositoryImpl
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
-import org.m4xvel.weatherapp.usecase.GetWeatherUseCase
 import org.m4xvel.weatherapp.util.provideDispatcher
 
 private val dataModule = module {
@@ -19,7 +18,6 @@ private val utilityModule = module {
 
 private val domainModule = module {
     single<WeatherRepository> { WeatherRepositoryImpl(get()) }
-    factory { GetWeatherUseCase() }
 }
 
 private val sharedModule = listOf(domainModule, dataModule, utilityModule)

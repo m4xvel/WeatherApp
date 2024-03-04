@@ -10,6 +10,7 @@ internal class WeatherRepositoryImpl(
     private val remoteDataSource: RemoteDataSource
 ) : WeatherRepository {
     override suspend fun getWeather(weatherRequest: WeatherRequest): Weather {
-        return remoteDataSource.getWeather(weatherRequest = weatherRequest).toWeather()
+        return remoteDataSource.getWeather(weatherRequest = weatherRequest)
+            .toWeather()
     }
 }

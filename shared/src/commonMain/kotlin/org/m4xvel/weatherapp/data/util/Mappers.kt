@@ -6,9 +6,9 @@ import org.m4xvel.weatherapp.domain.model.Weather
 internal fun WeatherResponse.toWeather(): Weather {
     return Weather(
         name = name,
-        temp = temp,
-        speed = speed,
-        humidity = humidity,
-        pressure = pressure
+        temp = main.temp,
+        speed = wind.speed,
+        humidity = main.humidity,
+        pressure = main.pressure
     )
 }

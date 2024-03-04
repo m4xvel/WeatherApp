@@ -20,6 +20,8 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(projects.shared)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -69,4 +71,3 @@ android {
 dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 }
-
