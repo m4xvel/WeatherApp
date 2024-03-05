@@ -7,5 +7,6 @@ data class DataState(
     val humidity: Int = 0,
     val pressure: Int = 0,
     val searchText: String = "",
-    val showButton: Boolean = false
+    val showButton: Boolean = false,
+    val loading: Boolean = false
 )

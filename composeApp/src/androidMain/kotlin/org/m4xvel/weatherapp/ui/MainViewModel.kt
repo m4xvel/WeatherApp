@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,16 +29,19 @@ class MainViewModel(
         _state.update { currentState ->
             currentState.copy(
                 searchText = text,
-                showButton = text.isNotEmpty()
+                showButton = text.isNotEmpty(),
+                loading = true
             )
         }
+
+        if (text.isEmpty()) _state.update { it.copy(loading = false) }
 
         geoRequest = GeoRequest(text)
 
         waitInput?.cancel()
 
         waitInput = viewModelScope.launch {
-            delay(3000)
+            delay(600)
             setData()
         }
     }
@@ -48,7 +50,8 @@ class MainViewModel(
         _state.update { currentState ->
             currentState.copy(
                 searchText = "",
-                showButton = false
+                showButton = false,
+                loading = false
             )
         }
         waitInput?.cancel()
@@ -59,6 +62,7 @@ class MainViewModel(
             try {
                 val cityName = weatherRepository.getCityName(geoRequest)
                 val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
+
                 _state.update { currentState ->
                     currentState.copy(
                         city = weather.name,
