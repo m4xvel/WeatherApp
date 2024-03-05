@@ -1,7 +1,6 @@
 package org.m4xvel.weatherapp.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.DefaultMarqueeIterations
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
@@ -28,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -60,15 +61,17 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
         shape = RoundedCornerShape(30.dp),
         border = BorderStroke(1.dp, Color.Black)
     ) {
-        val searchText by mainViewModel.searchText
-        val showButton by mainViewModel.showButton
+
+        val state by mainViewModel.state.collectAsState()
 
         TextField(
             modifier = Modifier
                 .fillMaxSize(),
-            value = searchText,
+            value = state.searchText,
             singleLine = true,
-            onValueChange = { mainViewModel.setSearchText(it) },
+            onValueChange = {
+                mainViewModel.setSearchText(it)
+            },
             placeholder = { Text(text = "Найти город...") },
             textStyle = TextStyle(fontSize = 18.sp),
             colors = TextFieldDefaults.textFieldColors(
@@ -88,7 +91,7 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
                 }
             },
             trailingIcon = {
-                if (showButton) {
+                if (state.showButton) {
                     IconButton(
                         onClick = {
                             mainViewModel.clearSearchText()
@@ -106,11 +109,7 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
 @Composable
 private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
 
-    val city by mainViewModel.city
-    val temp by mainViewModel.temp
-    val speed by mainViewModel.speed
-    val humidity by mainViewModel.humidity
-    val pressure by mainViewModel.pressure
+    val state by mainViewModel.state.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -124,7 +123,7 @@ private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
             border = BorderStroke(1.dp, Color.Black),
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                CityAndTemperature(city, temp)
+                CityAndTemperature(state.city, state.temp)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -132,9 +131,9 @@ private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
                         .padding(start = 30.dp),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    AdditionalDoubleInformation("скорость ветра:", speed, "м/c")
-                    AdditionalIntInformation("влажность:", humidity, "%")
-                    AdditionalIntInformation("давление:", pressure, "mmHg")
+                    AdditionalDoubleInformation("скорость ветра:", state.speed, "м/c")
+                    AdditionalIntInformation("влажность:", state.humidity, "%")
+                    AdditionalIntInformation("давление:", state.pressure, "mmHg")
                 }
             }
         }
@@ -156,8 +155,8 @@ private fun CityAndTemperature(city: String, temperature: Int) {
                 .basicMarquee(
                     animationMode = MarqueeAnimationMode.Immediately,
                     spacing = MarqueeSpacing(50.dp)
-            ),
-            text = "$city",
+                ),
+            text = city,
             fontSize = 48.sp,
         )
         Text(

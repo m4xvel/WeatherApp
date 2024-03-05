@@ -5,20 +5,25 @@ import io.ktor.client.request.get
 import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.data.remote.geocoder.GeoResponse
 
-internal class WeatherService: WeatherClient() {
+private const val API_KEY = "22599d210f9ff6005c96992af90fd829"
+
+internal class WeatherService : WeatherClient() {
 
     suspend fun getWeather(lat: Double, lon: Double): WeatherResponse = client.get {
         pathUrl("/weather")
         url {
             parameters.append("lat", lat.toString())
             parameters.append("lon", lon.toString())
+            parameters.append("appid", API_KEY)
+            parameters.append("units", "metric")
         }
     }.body()
 
-    suspend fun getCityName(geoRequest: GeoRequest): GeoResponse = client.get {
+    suspend fun getCityName(geoRequest: GeoRequest): List<GeoResponse> = client.get {
         pathUrlForName("/direct")
         url {
             parameters.append("q", geoRequest.city)
+            parameters.append("appid", API_KEY)
         }
     }.body()
 }

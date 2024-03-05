@@ -1,5 +1,6 @@
 package org.m4xvel.weatherapp.data.remote
 
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -14,11 +15,19 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.m4xvel.weatherapp.util.initLogger
 
-private const val API_KEY = "22599d210f9ff6005c96992af90fd829"
 
 internal abstract class WeatherClient {
     val client = HttpClient {
+        install(Logging) {
+            level = LogLevel.HEADERS
+            logger = object : Logger {
+                override fun log(message: String) {
+                    Napier.v(tag = "HTTP Client", message = message)
+                }
+            }
+        }
         install(ContentNegotiation) {
             json(Json {
                 isLenient = false
@@ -26,14 +35,12 @@ internal abstract class WeatherClient {
                 useAlternativeNames = false
             })
         }
-    }
+    }.also { initLogger() }
     fun HttpRequestBuilder.pathUrl(path: String) {
         url {
             protocol = URLProtocol.HTTPS
             host = "api.openweathermap.org/data/2.5"
             path(path)
-            parameter("appid", API_KEY)
-            parameter("units", "metric")
         }
     }
 
@@ -42,7 +49,6 @@ internal abstract class WeatherClient {
             protocol = URLProtocol.HTTPS
             host = "api.openweathermap.org/geo/1.0"
             path(path)
-            parameter("appid", API_KEY)
         }
     }
 }

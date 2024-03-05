@@ -7,3 +7,5 @@ internal interface Dispatcher {
 }
 
 internal expect fun provideDispatcher(): Dispatcher
+
+internal expect fun initLogger()

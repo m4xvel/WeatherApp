@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.koin.core)
             implementation(libs.ktor.client.logging)
+            implementation(libs.napier)
         }
 
         androidMain.dependencies {
