@@ -51,7 +51,8 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Search()
-            if (!state.loading) LoaderIndicator() else WeatherCard()
+            if (state.loading) LoaderIndicator()
+            if (state.showCard) WeatherCard()
         }
     }
 }

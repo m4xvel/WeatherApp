@@ -30,7 +30,6 @@ class MainViewModel(
             currentState.copy(
                 searchText = text,
                 showButton = text.isNotEmpty(),
-                loading = true
             )
         }
 
@@ -41,6 +40,7 @@ class MainViewModel(
         waitInput?.cancel()
 
         waitInput = viewModelScope.launch {
+            isLoading(true)
             delay(600)
             setData()
         }
@@ -51,10 +51,26 @@ class MainViewModel(
             currentState.copy(
                 searchText = "",
                 showButton = false,
-                loading = false
             )
         }
         waitInput?.cancel()
+    }
+
+    private fun isLoading(value: Boolean) {
+        if(value) {
+            _state.update { currentState ->
+                currentState.copy(
+                    loading = true
+                )
+            }
+        } else {
+            _state.update { currentState ->
+                currentState.copy(
+                    loading = false,
+                    showCard = true
+                )
+            }
+        }
     }
 
     private fun setData() {
@@ -69,9 +85,10 @@ class MainViewModel(
                         temp = weather.temp.roundToInt(),
                         speed = weather.speed,
                         humidity = weather.humidity,
-                        pressure = weather.pressure
+                        pressure = weather.pressure,
                     )
                 }
+                isLoading(false)
             } catch (e: Exception) {
                 Log.d("MyTag", "Error: ${e.localizedMessage}")
             }
