@@ -22,6 +22,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(projects.shared)
             implementation(libs.koin.androidx.compose)
+            implementation(libs.accompanist.permissions)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

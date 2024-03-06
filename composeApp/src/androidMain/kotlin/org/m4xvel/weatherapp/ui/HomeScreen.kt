@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
@@ -40,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
+import org.m4xvel.weatherapp.ui.permissions.LocationPermissionsScreen
 
 @Composable
 fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
@@ -52,6 +52,7 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
         ) {
             Search()
             if (state.loading) LoaderIndicator()
+            LocationPermissionsScreen()
             if (state.showCard) WeatherCard()
         }
     }
@@ -61,7 +62,8 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
 private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
     Card(
         modifier = Modifier
-            .padding(horizontal = 10.dp, vertical = 20.dp)
+            .fillMaxWidth(0.9f)
+            .padding(vertical = 20.dp)
             .size(width = 600.dp, height = 60.dp),
         shape = RoundedCornerShape(30.dp),
         border = BorderStroke(1.dp, Color.Black)

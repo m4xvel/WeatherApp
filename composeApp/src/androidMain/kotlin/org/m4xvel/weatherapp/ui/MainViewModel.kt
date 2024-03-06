@@ -41,7 +41,7 @@ class MainViewModel(
 
         waitInput = viewModelScope.launch {
             isLoading(true)
-            delay(600)
+            delay(650)
             setData()
         }
     }
@@ -90,9 +90,9 @@ class MainViewModel(
                 }
                 isLoading(false)
             } catch (e: Exception) {
+                _state.update { it.copy( loading = false ) }
                 Log.d("MyTag", "Error: ${e.localizedMessage}")
             }
         }
-        waitInput?.cancel()
     }
 }

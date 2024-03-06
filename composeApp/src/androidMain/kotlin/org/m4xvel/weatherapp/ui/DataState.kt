@@ -21,5 +21,6 @@ data class DataState(
     val pressure: Int? = null,
     val searchText: String? = null,
     val showButton: Boolean = false,
-    val loading: Boolean = false
+    val showCard: Boolean = false,
+    val loading: Boolean = false,
 )*/
