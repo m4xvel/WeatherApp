@@ -1,4 +1,4 @@
-package org.m4xvel.weatherapp.ui
+package org.m4xvel.weatherapp.model
 
 data class DataState(
     val city: String = "",

@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
+import org.m4xvel.weatherapp.model.DataState
+import org.m4xvel.weatherapp.model.GeoState
 import kotlin.math.roundToInt
 
 class MainViewModel(
@@ -25,6 +27,9 @@ class MainViewModel(
 
     private var waitInput: Job? = null
 
+    private val _geoState = MutableStateFlow(GeoState())
+    val geoState: StateFlow<GeoState> = _geoState.asStateFlow()
+
     fun setSearchText(text: String) {
         _state.update { currentState ->
             currentState.copy(
@@ -37,13 +42,7 @@ class MainViewModel(
 
         geoRequest = GeoRequest(text)
 
-        waitInput?.cancel()
-
-        waitInput = viewModelScope.launch {
-            isLoading(true)
-            delay(650)
-            setData()
-        }
+        isLoadingAndSetData()
     }
 
     fun clearSearchText() {
@@ -54,6 +53,16 @@ class MainViewModel(
             )
         }
         waitInput?.cancel()
+    }
+
+    fun isLoadingAndSetData() {
+        waitInput?.cancel()
+
+        waitInput = viewModelScope.launch {
+            isLoading(true)
+            delay(650)
+            setData()
+        }
     }
 
     private fun isLoading(value: Boolean) {
@@ -77,7 +86,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 val cityName = weatherRepository.getCityName(geoRequest)
-                val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
+                val weather = weatherRepository.getWeather(geoState.value.lat!!, geoState.value.lon!!)
 
                 _state.update { currentState ->
                     currentState.copy(

@@ -23,6 +23,8 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.koin.androidx.compose)
             implementation(libs.accompanist.permissions)
+            implementation(libs.play.services.location)
+            implementation(libs.kotlinx.coroutines.play.services)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
