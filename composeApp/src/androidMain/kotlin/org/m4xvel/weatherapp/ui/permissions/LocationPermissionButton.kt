@@ -14,10 +14,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -45,9 +41,7 @@ fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
 
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
-    val locationRequest = LocationRequest.Builder(1000L).build()
-
-    var isLocationUpdateRequested by remember { mutableStateOf(false) }
+    val locationRequest = LocationRequest.Builder(1).build()
 
     Row(
         modifier = Modifier.fillMaxWidth(0.9f)
@@ -59,27 +53,24 @@ fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
                 .border(color = Color.Black, width = 2.dp, shape = CircleShape),
             onClick = {
                 if (locationPermissionState.status.isGranted) {
-                    if (!isLocationUpdateRequested) {
-                        try {
-                            fusedLocationClient.requestLocationUpdates(
-                                locationRequest,
-                                object : LocationCallback() {
-                                    override fun onLocationResult(locationResult: LocationResult) {
-                                        for (location in locationResult.locations) {
-                                            mainViewModel.setDataLocation(
-                                                location.latitude,
-                                                location.longitude
-                                            )
-                                        }
+                    try {
+                        fusedLocationClient.requestLocationUpdates(
+                            locationRequest,
+                            object : LocationCallback() {
+                                override fun onLocationResult(locationResult: LocationResult) {
+                                    for (location in locationResult.locations) {
+                                        mainViewModel.setDataLocation(
+                                            location.latitude,
+                                            location.longitude
+                                        )
                                     }
-                                },
-                                Looper.getMainLooper()
-                            )
-                            isLocationUpdateRequested = true
+                                }
+                            },
+                            Looper.getMainLooper()
+                        )
 
-                        } catch (e: SecurityException) {
-                            Log.d("MyTag", "Error: ${e.localizedMessage}")
-                        }
+                    } catch (e: SecurityException) {
+                        Log.d("MyTag", "Error: ${e.localizedMessage}")
                     }
                 } else {
                     locationPermissionState.launchPermissionRequest()

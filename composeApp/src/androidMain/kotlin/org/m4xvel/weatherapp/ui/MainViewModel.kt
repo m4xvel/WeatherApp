@@ -3,7 +3,6 @@ package org.m4xvel.weatherapp.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
 import kotlin.math.roundToInt
@@ -31,20 +29,29 @@ class MainViewModel(
         _state.update { currentState ->
             currentState.copy(
                 searchText = text,
-                showButton = text.isNotEmpty(),
+                showButton = text.isNotEmpty()
             )
         }
 
-        if (text.isEmpty()) _state.update { it.copy(loading = false) }
+        if (text.length > 3 && text.length > _state.value.previousSearchTextLength) {
 
-        geoRequest = GeoRequest(text)
+            _state.update { it.copy(previousSearchTextLength = text.length) }
 
-        waitInput?.cancel()
+            if (text.isEmpty()) _state.update { it.copy(loading = false) }
 
-        waitInput = viewModelScope.launch {
-            isLoading(true)
-            delay(650)
-            setDataApi()
+            geoRequest = GeoRequest(text)
+
+            waitInput?.cancel()
+
+            waitInput = viewModelScope.launch {
+                isLoading(true)
+                delay(650)
+                setDataApi()
+            }
+        }
+
+        if (text.length < _state.value.previousSearchTextLength) {
+            _state.update { it.copy(previousSearchTextLength = text.length) }
         }
     }
 
@@ -76,26 +83,29 @@ class MainViewModel(
     }
 
     fun setDataLocation(lat: Double?, lon: Double?) {
-        _state.update { it.copy(loading = true) }
-        viewModelScope.launch {
-            try {
-                val weather = weatherRepository.getWeather(lat!!, lon!!)
-                _state.update { currentState ->
-                    currentState.copy(
-                        city = weather.name,
-                        temp = weather.temp.roundToInt(),
-                        speed = weather.speed,
-                        humidity = weather.humidity,
-                        pressure = weather.pressure,
-                    )
+        if (lat != _state.value.previousLat && lon != _state.value.previousLon) {
+            _state.update { it.copy(loading = true) }
+            viewModelScope.launch {
+                try {
+                    val weather = weatherRepository.getWeather(lat!!, lon!!)
+                    _state.update { currentState ->
+                        currentState.copy(
+                            city = weather.name,
+                            temp = weather.temp.roundToInt(),
+                            speed = weather.speed,
+                            humidity = weather.humidity,
+                            pressure = weather.pressure,
+                            previousLat = lat,
+                            previousLon = lon
+                        )
+                    }
+                    isLoading(false)
+                } catch (e: Exception) {
+                    _state.update { it.copy(loading = false) }
+                    Log.d("MyTag", "Error: ${e.localizedMessage}")
                 }
-                isLoading(false)
-            } catch (e: Exception) {
-                _state.update { it.copy(loading = false) }
-                Log.d("MyTag", "Error: ${e.localizedMessage}")
             }
         }
-        Log.d("MyTag", "lat: ${lat}, lon: ${lon}")
     }
 
     private fun setDataApi() {
@@ -111,6 +121,8 @@ class MainViewModel(
                         speed = weather.speed,
                         humidity = weather.humidity,
                         pressure = weather.pressure,
+                        previousLat = null,
+                        previousLon = null
                     )
                 }
                 isLoading(false)
