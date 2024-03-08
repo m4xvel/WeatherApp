@@ -75,10 +75,6 @@ class MainViewModel(
         }
     }
 
-//    fun getDataLocation() {
-//
-//    }
-
     fun setDataLocation(lat: Double?, lon: Double?) {
         _state.update { it.copy(loading = true) }
         viewModelScope.launch {

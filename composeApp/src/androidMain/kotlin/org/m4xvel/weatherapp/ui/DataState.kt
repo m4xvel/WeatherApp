@@ -11,16 +11,3 @@ data class DataState(
     val showCard: Boolean = false,
     val loading: Boolean = false,
 )
-
-/*
-data class DataState(
-    val city: String? = null,
-    val temp: Int? = null,
-    val speed: Double? = null,
-    val humidity: Int? = null,
-    val pressure: Int? = null,
-    val searchText: String? = null,
-    val showButton: Boolean = false,
-    val showCard: Boolean = false,
-    val loading: Boolean = false,
-)*/

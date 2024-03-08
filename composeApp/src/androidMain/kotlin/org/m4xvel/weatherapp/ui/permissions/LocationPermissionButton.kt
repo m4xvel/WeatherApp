@@ -1,5 +1,6 @@
 package org.m4xvel.weatherapp.ui.permissions
 
+import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,37 +14,40 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import org.koin.androidx.compose.koinViewModel
 import org.m4xvel.weatherapp.ui.MainViewModel
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun LocationPermissionsScreen(mainViewModel: MainViewModel = koinViewModel()) {
+fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
 
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
-    val scope = rememberCoroutineScope()
-
     val context = LocalContext.current
 
-    val locationClient = LocationServices.getFusedLocationProviderClient(context)
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    val locationRequest = LocationRequest.Builder(1000L).build()
+
+    var isLocationUpdateRequested by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier.fillMaxWidth(0.9f)
@@ -55,17 +59,27 @@ fun LocationPermissionsScreen(mainViewModel: MainViewModel = koinViewModel()) {
                 .border(color = Color.Black, width = 2.dp, shape = CircleShape),
             onClick = {
                 if (locationPermissionState.status.isGranted) {
-                    try {
-                        scope.launch(Dispatchers.IO) {
-                            val result = locationClient.lastLocation.await()
-                            val lat = result?.latitude
-                            val lon = result?.longitude
-//                            setDataLocation(lat, lon)
-                            Log.d("MyTag", "Ответ: $lat,  $lon")
-                        }
+                    if (!isLocationUpdateRequested) {
+                        try {
+                            fusedLocationClient.requestLocationUpdates(
+                                locationRequest,
+                                object : LocationCallback() {
+                                    override fun onLocationResult(locationResult: LocationResult) {
+                                        for (location in locationResult.locations) {
+                                            mainViewModel.setDataLocation(
+                                                location.latitude,
+                                                location.longitude
+                                            )
+                                        }
+                                    }
+                                },
+                                Looper.getMainLooper()
+                            )
+                            isLocationUpdateRequested = true
 
-                    } catch (e: SecurityException) {
-                        //Toast
+                        } catch (e: SecurityException) {
+                            Log.d("MyTag", "Error: ${e.localizedMessage}")
+                        }
                     }
                 } else {
                     locationPermissionState.launchPermissionRequest()

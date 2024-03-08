@@ -39,7 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
-import org.m4xvel.weatherapp.ui.permissions.LocationPermissionsScreen
+import org.m4xvel.weatherapp.ui.permissions.LocationPermissionButton
 
 @Composable
 fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
@@ -52,7 +52,7 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
         ) {
             Search()
             if (state.loading) LoaderIndicator()
-            LocationPermissionsScreen()
+            LocationPermissionButton()
             if (state.showCard) WeatherCard()
         }
     }
