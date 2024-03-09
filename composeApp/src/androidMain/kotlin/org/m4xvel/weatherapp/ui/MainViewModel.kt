@@ -1,8 +1,16 @@
 package org.m4xvel.weatherapp.ui
 
+import android.content.Context
+import android.location.LocationManager
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,29 +90,51 @@ class MainViewModel(
         }
     }
 
-    fun setDataLocation(lat: Double?, lon: Double?) {
-        if (lat != _state.value.previousLat && lon != _state.value.previousLon) {
-            _state.update { it.copy(loading = true) }
-            viewModelScope.launch {
-                try {
-                    val weather = weatherRepository.getWeather(lat!!, lon!!)
-                    _state.update { currentState ->
-                        currentState.copy(
-                            city = weather.name,
-                            temp = weather.temp.roundToInt(),
-                            speed = weather.speed,
-                            humidity = weather.humidity,
-                            pressure = weather.pressure,
-                            previousLat = lat,
-                            previousLon = lon
-                        )
-                    }
-                    isLoading(false)
-                } catch (e: Exception) {
-                    _state.update { it.copy(loading = false) }
-                    Log.d("MyTag", "Error: ${e.localizedMessage}")
-                }
+    fun setDataLocation(context: Context) {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        val locationRequest = LocationRequest.Builder(1).build()
+        Log.d("MyTag", "$locationRequest")
+        try {
+            if (isLocationEnabled(context)) {
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    object : LocationCallback() {
+                        override fun onLocationResult(locationResult: LocationResult) {
+                            for (location in locationResult.locations) {
+                                if (location.latitude != _state.value.previousLat && location.longitude != _state.value.previousLon) {
+                                    _state.update { it.copy(loading = true) }
+                                    viewModelScope.launch {
+                                        try {
+                                            val weather = weatherRepository.getWeather(location.latitude, location.longitude)
+                                            _state.update { currentState ->
+                                                currentState.copy(
+                                                    city = weather.name,
+                                                    temp = weather.temp.roundToInt(),
+                                                    speed = weather.speed,
+                                                    humidity = weather.humidity,
+                                                    pressure = weather.pressure,
+                                                    previousLat = location.latitude,
+                                                    previousLon = location.longitude
+                                                )
+                                            }
+                                            isLoading(false)
+                                        } catch (e: Exception) {
+                                            _state.update { it.copy(loading = false) }
+                                            Log.d("MyTag", "Error: ${e.localizedMessage}")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    Looper.getMainLooper()
+                )
+            } else {
+                Toast.makeText(context, "Включите местоположение!", Toast.LENGTH_SHORT).show()
             }
+
+        } catch (e: SecurityException) {
+            Log.d("MyTag", "Error: ${e.localizedMessage}")
         }
     }
 
@@ -132,4 +162,10 @@ class MainViewModel(
             }
         }
     }
+
+    private fun isLocationEnabled(context: Context): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
 }
