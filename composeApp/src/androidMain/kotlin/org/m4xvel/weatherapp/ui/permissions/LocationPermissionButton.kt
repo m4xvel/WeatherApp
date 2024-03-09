@@ -1,7 +1,10 @@
 package org.m4xvel.weatherapp.ui.permissions
 
+import android.content.Context
+import android.location.LocationManager
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -54,20 +57,24 @@ fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
             onClick = {
                 if (locationPermissionState.status.isGranted) {
                     try {
-                        fusedLocationClient.requestLocationUpdates(
-                            locationRequest,
-                            object : LocationCallback() {
-                                override fun onLocationResult(locationResult: LocationResult) {
-                                    for (location in locationResult.locations) {
-                                        mainViewModel.setDataLocation(
-                                            location.latitude,
-                                            location.longitude
-                                        )
+                        if (isLocationEnabled(context)) {
+                            fusedLocationClient.requestLocationUpdates(
+                                locationRequest,
+                                object : LocationCallback() {
+                                    override fun onLocationResult(locationResult: LocationResult) {
+                                        for (location in locationResult.locations) {
+                                            mainViewModel.setDataLocation(
+                                                location.latitude,
+                                                location.longitude
+                                            )
+                                        }
                                     }
-                                }
-                            },
-                            Looper.getMainLooper()
-                        )
+                                },
+                                Looper.getMainLooper()
+                            )
+                        } else {
+                            Toast.makeText(context, "Включите местоположение!", Toast.LENGTH_SHORT).show()
+                        }
 
                     } catch (e: SecurityException) {
                         Log.d("MyTag", "Error: ${e.localizedMessage}")
@@ -83,4 +90,9 @@ fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
             )
         }
     }
+}
+
+private fun isLocationEnabled(context: Context): Boolean {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
