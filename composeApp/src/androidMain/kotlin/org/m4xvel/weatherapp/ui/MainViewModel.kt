@@ -109,17 +109,19 @@ class MainViewModel(
                                                 location.latitude,
                                                 location.longitude
                                             )
-                                            _state.update { currentState ->
-                                                currentState.copy(
-                                                    city = weather.name,
-                                                    temp = weather.temp.roundToInt(),
-                                                    speed = weather.speed,
-                                                    humidity = weather.humidity,
-                                                    pressure = weather.pressure,
-                                                    previousLat = location.latitude,
-                                                    previousLon = location.longitude
-                                                )
-                                            }
+                                            weatherRepository.insertNote(weather)
+
+//                                            _state.update { currentState ->
+//                                                currentState.copy(
+//                                                    city = weather.name,
+//                                                    temp = weather.temp.roundToInt(),
+//                                                    speed = weather.speed,
+//                                                    humidity = weather.humidity,
+//                                                    pressure = weather.pressure,
+//                                                    previousLat = location.latitude,
+//                                                    previousLon = location.longitude
+//                                                )
+//                                            }
                                             isLoading(false)
                                         } catch (e: Exception) {
                                             _state.update { it.copy(loading = false) }
@@ -146,18 +148,22 @@ class MainViewModel(
             try {
                 val cityName = weatherRepository.getCityName(geoRequest)
                 val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
+                weatherRepository.insertNote(weather)
+                val allWeather = weatherRepository.getAllWeather()
+                Log.d("MyTag", "$allWeather")
 
-                _state.update { currentState ->
-                    currentState.copy(
-                        city = weather.name,
-                        temp = weather.temp.roundToInt(),
-                        speed = weather.speed,
-                        humidity = weather.humidity,
-                        pressure = weather.pressure,
-                        previousLat = null,
-                        previousLon = null
-                    )
-                }
+//                _state.update { currentState ->
+//                    currentState.copy(
+//                        city = weather.name,
+//                        temp = weather.temp.roundToInt(),
+//                        speed = weather.speed,
+//                        humidity = weather.humidity,
+//                        pressure = weather.pressure,
+//                        previousLat = null,
+//                        previousLon = null
+//                    )
+//                }
+
                 isLoading(false)
             } catch (e: Exception) {
                 _state.update { it.copy(loading = false) }

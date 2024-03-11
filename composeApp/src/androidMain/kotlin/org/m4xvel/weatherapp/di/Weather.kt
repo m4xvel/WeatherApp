@@ -9,7 +9,7 @@ class Weather: Application() {
         super.onCreate()
         startKoin {
             androidContext(this@Weather)
-            modules(getSharedModule().plus(appModule))
+            modules(getSharedModule() + appModule + module)
         }
     }
 }

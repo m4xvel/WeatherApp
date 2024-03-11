@@ -21,7 +21,7 @@ napierVersion = "2.7.1"
 accompanist = "0.32.0"
 location = "21.2.0"
 coroutines = "1.8.0"
-sqldelightVersion = "2.0.0"
+sqldelightVersion = "2.0.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

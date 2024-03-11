@@ -51,9 +51,9 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Search()
-            if (state.loading) LoaderIndicator()
-            LocationPermissionButton()
-            if (state.showCard) WeatherCard()
+//            if (state.loading) LoaderIndicator()
+//            LocationPermissionButton()
+//            if (state.showCard) WeatherCard()
         }
     }
 }
@@ -184,7 +184,7 @@ private fun AdditionalDoubleInformation(optionName: String, value: Double, symbo
 }
 
 @Composable
-private fun AdditionalIntInformation(optionName: String, value: Int, symbol: String) {
+private fun AdditionalIntInformation(optionName: String, value: Long, symbol: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically

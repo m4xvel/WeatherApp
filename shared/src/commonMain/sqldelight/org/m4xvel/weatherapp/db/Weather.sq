@@ -1,14 +1,22 @@
 CREATE TABLE Weather (
-name TEXT NOT NULL,
-temp INTEGER NOT NULL,
-speed REAL NOT NULL,
-humidity INTEGER NOT NULL,
-pressure INTEGER NOT NULL
+    name TEXT NOT NULL,
+    temp REAL NOT NULL,
+    speed REAL NOT NULL,
+    humidity INTEGER NOT NULL,
+    pressure INTEGER NOT NULL
 );
 
-selectALL:
-SELECT * FROM Weather;
+getAllWeather:
+SELECT *
+FROM Weather;
 
 insertWeather:
-INSERT OR REPLACE INTO Weather(name, temp, speed, humidity, pressure)
-VALUES (?, ?, ?, ?, ?);
+INSERT OR REPLACE
+INTO Weather(
+    name,
+    temp,
+    speed,
+    humidity,
+    pressure
+) VALUES(?,?,?,?,?);
+
