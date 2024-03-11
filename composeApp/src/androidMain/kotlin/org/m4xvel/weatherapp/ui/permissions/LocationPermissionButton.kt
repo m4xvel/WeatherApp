@@ -1,10 +1,5 @@
 package org.m4xvel.weatherapp.ui.permissions
 
-import android.content.Context
-import android.location.LocationManager
-import android.os.Looper
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,17 +19,13 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import org.koin.androidx.compose.koinViewModel
 import org.m4xvel.weatherapp.ui.MainViewModel
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-    fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
+fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
 
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_COARSE_LOCATION

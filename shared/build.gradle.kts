@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.pluginSerialization)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -38,6 +39,11 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.ktor.client.android)
             implementation(libs.koin.android)
+            implementation(libs.sqldelight.android.driver)
+        }
+
+        nativeMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
         }
     }
 }
@@ -51,5 +57,13 @@ android {
     }
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+}
+
+sqldelight {
+    databases {
+        create("WeatherDatabase") {
+            packageName.set("org.m4xvel.weatherapp.db")
+        }
     }
 }

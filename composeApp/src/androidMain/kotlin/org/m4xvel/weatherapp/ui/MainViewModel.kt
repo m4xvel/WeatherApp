@@ -105,7 +105,10 @@ class MainViewModel(
                                     _state.update { it.copy(loading = true) }
                                     viewModelScope.launch {
                                         try {
-                                            val weather = weatherRepository.getWeather(location.latitude, location.longitude)
+                                            val weather = weatherRepository.getWeather(
+                                                location.latitude,
+                                                location.longitude
+                                            )
                                             _state.update { currentState ->
                                                 currentState.copy(
                                                     city = weather.name,
