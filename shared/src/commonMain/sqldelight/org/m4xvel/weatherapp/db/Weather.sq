@@ -20,3 +20,7 @@ INTO Weather(
     pressure
 ) VALUES(?,?,?,?,?);
 
+deleteAllWeather:
+DELETE FROM Weather;
+
+

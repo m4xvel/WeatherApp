@@ -41,4 +41,8 @@ internal class WeatherRepositoryImpl(
             .executeAsList()
             .map { it.toWeather() }
     }
+
+    override suspend fun deleteAllWeather() {
+        queries.deleteAllWeather()
+    }
 }

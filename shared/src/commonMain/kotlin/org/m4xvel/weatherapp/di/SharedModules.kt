@@ -1,6 +1,5 @@
 package org.m4xvel.weatherapp.di
 
-import app.cash.sqldelight.db.SqlDriver
 import org.koin.dsl.module
 import org.m4xvel.weatherapp.data.remote.RemoteDataSource
 import org.m4xvel.weatherapp.data.remote.WeatherService
@@ -26,6 +25,6 @@ private val databaseModule = module {
     single { WeatherDatabase(get()) }
 }
 
-private val sharedModule = listOf(domainModule, dataModule, utilityModule)
+private val sharedModule = listOf(domainModule, dataModule, utilityModule, databaseModule)
 
 fun getSharedModule() = sharedModule

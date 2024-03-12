@@ -33,6 +33,29 @@ class MainViewModel(
 
     private var waitInput: Job? = null
 
+    init {
+        viewModelScope.launch {
+            val allWeather = weatherRepository.getAllWeather()
+            for (item in allWeather) {
+                try {
+                    _state.update {
+                        it.copy(
+                            city = item.name,
+                            temp = item.temp.roundToInt(),
+                            speed = item.speed,
+                            humidity = item.humidity,
+                            pressure = item.pressure,
+                            showCard = true
+                        )
+                    }
+                } finally {
+                    weatherRepository.deleteAllWeather()
+                    Log.d("MyTag", "$allWeather")
+                }
+            }
+        }
+    }
+
     fun setSearchText(text: String) {
         _state.update { currentState ->
             currentState.copy(
@@ -63,6 +86,7 @@ class MainViewModel(
         }
     }
 
+
     fun clearSearchText() {
         _state.update { currentState ->
             currentState.copy(
@@ -75,14 +99,14 @@ class MainViewModel(
 
     private fun isLoading(value: Boolean) {
         if (value) {
-            _state.update { currentState ->
-                currentState.copy(
+            _state.update {
+                it.copy(
                     loading = true
                 )
             }
         } else {
-            _state.update { currentState ->
-                currentState.copy(
+            _state.update {
+                it.copy(
                     loading = false,
                     showCard = true
                 )
@@ -110,18 +134,22 @@ class MainViewModel(
                                                 location.longitude
                                             )
                                             weatherRepository.insertNote(weather)
+                                            val allWeather = weatherRepository.getAllWeather()
 
-//                                            _state.update { currentState ->
-//                                                currentState.copy(
-//                                                    city = weather.name,
-//                                                    temp = weather.temp.roundToInt(),
-//                                                    speed = weather.speed,
-//                                                    humidity = weather.humidity,
-//                                                    pressure = weather.pressure,
-//                                                    previousLat = location.latitude,
-//                                                    previousLon = location.longitude
-//                                                )
-//                                            }
+                                            for (item in allWeather) {
+                                                _state.update {
+                                                    it.copy(
+                                                        city = item.name,
+                                                        temp = item.temp.roundToInt(),
+                                                        speed = item.speed,
+                                                        humidity = item.humidity,
+                                                        pressure = item.pressure,
+                                                        previousLat = location.latitude,
+                                                        previousLon = location.longitude,
+                                                        searchText = ""
+                                                    )
+                                                }
+                                            }
                                             isLoading(false)
                                         } catch (e: Exception) {
                                             _state.update { it.copy(loading = false) }
@@ -150,20 +178,20 @@ class MainViewModel(
                 val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
                 weatherRepository.insertNote(weather)
                 val allWeather = weatherRepository.getAllWeather()
-                Log.d("MyTag", "$allWeather")
 
-//                _state.update { currentState ->
-//                    currentState.copy(
-//                        city = weather.name,
-//                        temp = weather.temp.roundToInt(),
-//                        speed = weather.speed,
-//                        humidity = weather.humidity,
-//                        pressure = weather.pressure,
-//                        previousLat = null,
-//                        previousLon = null
-//                    )
-//                }
-
+                for (item in allWeather) {
+                    _state.update {
+                        it.copy(
+                            city = item.name,
+                            temp = item.temp.roundToInt(),
+                            speed = item.speed,
+                            humidity = item.humidity,
+                            pressure = item.pressure,
+                            previousLat = null,
+                            previousLon = null
+                        )
+                    }
+                }
                 isLoading(false)
             } catch (e: Exception) {
                 _state.update { it.copy(loading = false) }

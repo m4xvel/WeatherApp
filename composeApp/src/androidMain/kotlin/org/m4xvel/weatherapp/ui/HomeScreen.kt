@@ -51,9 +51,9 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Search()
-//            if (state.loading) LoaderIndicator()
-//            LocationPermissionButton()
-//            if (state.showCard) WeatherCard()
+            if (state.loading) LoaderIndicator()
+            LocationPermissionButton()
+            if (state.showCard) WeatherCard()
         }
     }
 }
