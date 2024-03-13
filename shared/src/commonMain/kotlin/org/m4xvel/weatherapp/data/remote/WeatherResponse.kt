@@ -15,7 +15,7 @@ data class Wind(
 )
 
 @Serializable
-data class Main (
+data class Main(
     val temp: Double,
     val humidity: Long,
     val pressure: Long

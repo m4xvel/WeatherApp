@@ -1,4 +1,5 @@
 CREATE TABLE Weather (
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     temp REAL NOT NULL,
     speed REAL NOT NULL,
@@ -13,14 +14,12 @@ FROM Weather;
 insertWeather:
 INSERT OR REPLACE
 INTO Weather(
+    id,
     name,
     temp,
     speed,
     humidity,
     pressure
-) VALUES(?,?,?,?,?);
-
-deleteAllWeather:
-DELETE FROM Weather;
+) VALUES(1,?,?,?,?,?);
 
 

@@ -13,6 +13,4 @@ interface WeatherRepository {
     suspend fun insertNote(weather: Weather)
 
     suspend fun getAllWeather(): List<org.m4xvel.weatherapp.db.Weather>
-
-    suspend fun deleteAllWeather()
 }

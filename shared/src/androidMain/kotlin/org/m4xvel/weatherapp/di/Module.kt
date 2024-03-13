@@ -7,5 +7,11 @@ import org.koin.dsl.module
 import org.m4xvel.weatherapp.db.WeatherDatabase
 
 val module = module {
-    single<SqlDriver> { AndroidSqliteDriver(WeatherDatabase.Schema, androidContext(), "weather.db") }
+    single<SqlDriver> {
+        AndroidSqliteDriver(
+            WeatherDatabase.Schema,
+            androidContext(),
+            "weather.db"
+        )
+    }
 }

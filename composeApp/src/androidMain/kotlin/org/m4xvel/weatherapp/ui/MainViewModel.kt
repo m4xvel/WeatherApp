@@ -37,20 +37,15 @@ class MainViewModel(
         viewModelScope.launch {
             val allWeather = weatherRepository.getAllWeather()
             for (item in allWeather) {
-                try {
-                    _state.update {
-                        it.copy(
-                            city = item.name,
-                            temp = item.temp.roundToInt(),
-                            speed = item.speed,
-                            humidity = item.humidity,
-                            pressure = item.pressure,
-                            showCard = true
-                        )
-                    }
-                } finally {
-                    weatherRepository.deleteAllWeather()
-                    Log.d("MyTag", "$allWeather")
+                _state.update {
+                    it.copy(
+                        city = item.name,
+                        temp = item.temp.roundToInt(),
+                        speed = item.speed,
+                        humidity = item.humidity,
+                        pressure = item.pressure,
+                        showCard = true
+                    )
                 }
             }
         }
@@ -86,7 +81,6 @@ class MainViewModel(
         }
     }
 
-
     fun clearSearchText() {
         _state.update { currentState ->
             currentState.copy(
@@ -117,7 +111,6 @@ class MainViewModel(
     fun setDataLocation(context: Context) {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         val locationRequest = LocationRequest.Builder(1).build()
-        Log.d("MyTag", "$locationRequest")
         try {
             if (isLocationEnabled(context)) {
                 fusedLocationClient.requestLocationUpdates(
@@ -135,7 +128,7 @@ class MainViewModel(
                                             )
                                             weatherRepository.insertNote(weather)
                                             val allWeather = weatherRepository.getAllWeather()
-
+                                            Log.d("MyTag", "$allWeather")
                                             for (item in allWeather) {
                                                 _state.update {
                                                     it.copy(
@@ -146,7 +139,8 @@ class MainViewModel(
                                                         pressure = item.pressure,
                                                         previousLat = location.latitude,
                                                         previousLon = location.longitude,
-                                                        searchText = ""
+                                                        searchText = "",
+                                                        showButton = false
                                                     )
                                                 }
                                             }
@@ -178,6 +172,7 @@ class MainViewModel(
                 val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
                 weatherRepository.insertNote(weather)
                 val allWeather = weatherRepository.getAllWeather()
+                Log.d("MyTag", "$allWeather")
 
                 for (item in allWeather) {
                     _state.update {
@@ -204,5 +199,4 @@ class MainViewModel(
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
-
 }

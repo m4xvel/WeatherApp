@@ -4,6 +4,7 @@ import org.m4xvel.weatherapp.db.Weather
 
 fun Weather.toWeather(): Weather {
     return Weather(
+        id = id,
         name = name,
         temp = temp,
         speed = speed,
