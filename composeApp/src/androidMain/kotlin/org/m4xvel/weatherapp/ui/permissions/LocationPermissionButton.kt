@@ -14,7 +14,6 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -30,7 +29,6 @@ fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_COARSE_LOCATION
     )
-    val context = LocalContext.current
 
     Row(
         modifier = Modifier.fillMaxWidth(0.9f)
@@ -42,7 +40,7 @@ fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
                 .border(color = Color.Black, width = 2.dp, shape = CircleShape),
             onClick = {
                 if (locationPermissionState.status.isGranted) {
-                    mainViewModel.setDataLocation(context)
+                    mainViewModel.setDataLocation()
                 } else {
                     locationPermissionState.launchPermissionRequest()
                 }
