@@ -8,6 +8,6 @@ import org.m4xvel.weatherapp.data.repository.LocationProviderImpl
 import org.m4xvel.weatherapp.ui.MainViewModel
 
 val appModule = module {
-    single { LocationProviderImpl(get(), androidContext()) }
+    single<LocationProvider> { LocationProviderImpl(get(), androidContext()) }
     viewModel { MainViewModel(get(), get()) }
 }

@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
-import org.m4xvel.weatherapp.data.repository.LocationProviderImpl
+import org.m4xvel.weatherapp.data.repository.LocationProvider
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
 import kotlin.math.roundToInt
 
 class MainViewModel(
     private val weatherRepository: WeatherRepository,
-    private val locationProviderImpl: LocationProviderImpl
+    private val locationProvider: LocationProvider
 ) : ViewModel() {
 
     private lateinit var geoRequest: GeoRequest
@@ -103,7 +103,33 @@ class MainViewModel(
     }
 
     fun setDataLocation() {
-        locationProviderImpl.getLastLocation()
+        locationProvider.getLastLocation { lastLocation ->
+            if (lastLocation!!.latitude != _state.value.previousLat && lastLocation.longitude != _state.value.previousLon) {
+                _state.update { it.copy(loading = true) }
+                viewModelScope.launch {
+                    val weather =
+                        weatherRepository.getWeather(lastLocation.latitude, lastLocation.longitude)
+                    weatherRepository.insertNote(weather)
+                    val allWeather = weatherRepository.getAllWeather()
+
+                    for (item in allWeather) {
+                        _state.update {
+                            it.copy(
+                                city = item.name,
+                                temp = item.temp.roundToInt(),
+                                speed = item.speed,
+                                humidity = item.humidity,
+                                pressure = item.pressure,
+                                previousLat = lastLocation.latitude,
+                                previousLon = lastLocation.longitude,
+                                searchText = ""
+                            )
+                        }
+                    }
+                    isLoading(false)
+                }
+            }
+        }
     }
 
     private fun setDataApi() {
