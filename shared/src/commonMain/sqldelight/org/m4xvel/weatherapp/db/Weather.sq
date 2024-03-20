@@ -1,5 +1,6 @@
 CREATE TABLE Weather (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    searchText TEXT UNIQUE,
     name TEXT NOT NULL,
     temp REAL NOT NULL,
     speed REAL NOT NULL,
@@ -9,17 +10,18 @@ CREATE TABLE Weather (
 
 getAllWeather:
 SELECT *
-FROM Weather;
+FROM Weather WHERE searchText = ?;
 
 insertWeather:
 INSERT OR REPLACE
 INTO Weather(
     id,
+    searchText,
     name,
     temp,
     speed,
     humidity,
     pressure
-) VALUES(1,?,?,?,?,?);
+) VALUES(?,?,?,?,?,?, ?);
 
 

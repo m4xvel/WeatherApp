@@ -10,7 +10,7 @@ interface WeatherRepository {
 
     suspend fun getCityName(geoRequest: GeoRequest): CityName
 
-    suspend fun insertNote(weather: Weather)
+    suspend fun insertNote(weather: Weather, searchText: String)
 
-    suspend fun getAllWeather(): List<org.m4xvel.weatherapp.db.Weather>
+    suspend fun getAllWeather(city: String): List<org.m4xvel.weatherapp.db.Weather>
 }

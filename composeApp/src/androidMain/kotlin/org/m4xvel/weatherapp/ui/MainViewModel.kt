@@ -27,24 +27,6 @@ class MainViewModel(
 
     private var waitInput: Job? = null
 
-    init {
-        viewModelScope.launch {
-            val allWeather = weatherRepository.getAllWeather()
-            for (item in allWeather) {
-                _state.update {
-                    it.copy(
-                        city = item.name,
-                        temp = item.temp.roundToInt(),
-                        speed = item.speed,
-                        humidity = item.humidity,
-                        pressure = item.pressure,
-                        showCard = true
-                    )
-                }
-            }
-        }
-    }
-
     fun setSearchText(text: String) {
         _state.update { currentState ->
             currentState.copy(
@@ -66,7 +48,7 @@ class MainViewModel(
             waitInput = viewModelScope.launch {
                 isLoading(true)
                 delay(650)
-                setDataApi()
+                setDataApi(searchText = text)
             }
         }
 
@@ -107,58 +89,52 @@ class MainViewModel(
             if (lastLocation!!.latitude != _state.value.previousLat && lastLocation.longitude != _state.value.previousLon) {
                 _state.update { it.copy(loading = true) }
                 viewModelScope.launch {
-                    val weather =
-                        weatherRepository.getWeather(lastLocation.latitude, lastLocation.longitude)
-                    weatherRepository.insertNote(weather)
-                    val allWeather = weatherRepository.getAllWeather()
-
-                    for (item in allWeather) {
-                        _state.update {
-                            it.copy(
-                                city = item.name,
-                                temp = item.temp.roundToInt(),
-                                speed = item.speed,
-                                humidity = item.humidity,
-                                pressure = item.pressure,
-                                previousLat = lastLocation.latitude,
-                                previousLon = lastLocation.longitude,
-                                searchText = ""
-                            )
-                        }
-                    }
-                    isLoading(false)
-                }
-            }
-        }
-    }
-
-    private fun setDataApi() {
-        viewModelScope.launch {
-            try {
-                val cityName = weatherRepository.getCityName(geoRequest)
-                val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
-                weatherRepository.insertNote(weather)
-                val allWeather = weatherRepository.getAllWeather()
-                Log.d("MyTag", "$allWeather")
-
-                for (item in allWeather) {
+                    val weather = weatherRepository.getWeather(
+                        lastLocation.latitude,
+                        lastLocation.longitude
+                    )
                     _state.update {
                         it.copy(
-                            city = item.name,
-                            temp = item.temp.roundToInt(),
-                            speed = item.speed,
-                            humidity = item.humidity,
-                            pressure = item.pressure,
-                            previousLat = null,
-                            previousLon = null
+                            city = weather.name,
+                            temp = weather.temp.roundToInt(),
+                            speed = weather.speed,
+                            humidity = weather.humidity,
+                            pressure = weather.pressure,
+                            previousLat = lastLocation.latitude,
+                            previousLon = lastLocation.longitude,
+                            searchText = ""
                         )
                     }
                 }
                 isLoading(false)
-            } catch (e: Exception) {
-                _state.update { it.copy(loading = false) }
-                Log.d("MyTag", "Error: ${e.localizedMessage}")
             }
+        }
+    }
+
+    private fun setDataApi(searchText: String) {
+        viewModelScope.launch {
+            val allWeather = weatherRepository.getAllWeather(searchText)
+            if (allWeather.isEmpty()) {
+                val cityName = weatherRepository.getCityName(geoRequest)
+                val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
+                weatherRepository.insertNote(weather, searchText)
+            }
+            val allWeatherUpdate = weatherRepository.getAllWeather(searchText)
+            Log.d("MyTag", "$allWeatherUpdate")
+            for (item in allWeatherUpdate) {
+                _state.update {
+                    it.copy(
+                        city = item.name,
+                        temp = item.temp.roundToInt(),
+                        speed = item.speed,
+                        humidity = item.humidity,
+                        pressure = item.pressure,
+                        previousLat = null,
+                        previousLon = null
+                    )
+                }
+            }
+            isLoading(false)
         }
     }
 }

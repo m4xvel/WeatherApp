@@ -26,8 +26,10 @@ internal class WeatherRepositoryImpl(
             .toCityName()
     }
 
-    override suspend fun insertNote(weather: Weather) {
+    override suspend fun insertNote(weather: Weather, searchText: String) {
         queries.insertWeather(
+            id = null,
+            searchText = searchText,
             name = weather.name,
             temp = weather.temp,
             speed = weather.speed,
@@ -36,8 +38,8 @@ internal class WeatherRepositoryImpl(
         )
     }
 
-    override suspend fun getAllWeather(): List<org.m4xvel.weatherapp.db.Weather> {
-        return queries.getAllWeather()
+    override suspend fun getAllWeather(city: String): List<org.m4xvel.weatherapp.db.Weather> {
+        return queries.getAllWeather(searchText = city)
             .executeAsList()
             .map { it.toWeather() }
     }
