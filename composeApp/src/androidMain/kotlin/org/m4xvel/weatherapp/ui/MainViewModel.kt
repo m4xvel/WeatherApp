@@ -86,7 +86,11 @@ class MainViewModel(
 
     fun setDataLocation() {
         locationProvider.getLastLocation { lastLocation ->
-            if (lastLocation!!.latitude != _state.value.previousLat && lastLocation.longitude != _state.value.previousLon) {
+
+            val lat = lastLocation?.latitude
+            val lon = lastLocation?.longitude
+
+            if (lat != _state.value.previousLat && lat != null) {
                 _state.update { it.copy(loading = true) }
                 viewModelScope.launch {
                     val weather = weatherRepository.getWeather(
@@ -100,8 +104,8 @@ class MainViewModel(
                             speed = weather.speed,
                             humidity = weather.humidity,
                             pressure = weather.pressure,
-                            previousLat = lastLocation.latitude,
-                            previousLon = lastLocation.longitude,
+                            previousLat = lat,
+                            previousLon = lon,
                             searchText = ""
                         )
                     }

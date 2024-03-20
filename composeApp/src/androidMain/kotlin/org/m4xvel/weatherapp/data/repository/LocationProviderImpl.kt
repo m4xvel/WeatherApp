@@ -10,16 +10,16 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
 
 class LocationProviderImpl(
-    private val weatherRepository: WeatherRepository,
     private val context: Context
 ): LocationProvider {
     private var lastLocation: Location? = null
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    private val locationRequest = LocationRequest.Builder(1000L).build()
+    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 10000).build()
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.locations.lastOrNull()?.let {
@@ -31,6 +31,7 @@ class LocationProviderImpl(
 
     init {
         requestLocationUpdate()
+        Log.d("!!!", "[init] $lastLocation")
     }
 
     private fun requestLocationUpdate() {
@@ -51,12 +52,14 @@ class LocationProviderImpl(
 
     override fun getLastLocation(callback: (Location?) -> Unit) {
         if (lastLocation != null) {
-            Log.d("!!!", "$lastLocation")
+            Log.d("!!!", "[if] $lastLocation")
             callback(lastLocation)
         } else {
             if (isLocationEnabled()) {
                 requestLocationUpdate()
-                Log.d("!!!", "$lastLocation")
+                Log.d("!!!", "[else] $lastLocation")
+                Log.d("!!!", "[locationResult] ${locationCallback}")
+                Log.d("!!!", "[locationRequest] ${locationRequest}")
                 callback(lastLocation)
             } else {
                 Toast.makeText(context, "Включите местоположение!", Toast.LENGTH_SHORT).show()
