@@ -13,4 +13,6 @@ interface WeatherRepository {
     suspend fun insertNote(weather: Weather, searchText: String)
 
     suspend fun getAllWeather(city: String): List<org.m4xvel.weatherapp.db.Weather>
+
+    suspend fun updateWeather(weather: Weather, searchText: String)
 }

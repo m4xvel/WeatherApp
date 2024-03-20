@@ -43,4 +43,15 @@ internal class WeatherRepositoryImpl(
             .executeAsList()
             .map { it.toWeather() }
     }
+
+    override suspend fun updateWeather(weather: Weather, searchText: String) {
+        queries.updateWeather(
+            searchText = searchText,
+            name = weather.name,
+            temp = weather.temp,
+            speed = weather.speed,
+            humidity = weather.humidity,
+            pressure = weather.pressure
+        )
+    }
 }
