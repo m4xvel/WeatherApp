@@ -112,29 +112,47 @@ class MainViewModel(
     }
 
     private fun setDataApi(searchText: String) {
-        viewModelScope.launch {
-            val allWeather = weatherRepository.getAllWeather(searchText)
-            if (allWeather.isEmpty()) {
+        try {
+            viewModelScope.launch {
+                val allWeather = weatherRepository.getAllWeather(searchText)
+                Log.d("MyTag", "$allWeather")
+                for (item in allWeather) {
+                    _state.update {
+                        it.copy(
+                            city = item.name,
+                            temp = item.temp.roundToInt(),
+                            speed = item.speed,
+                            humidity = item.humidity,
+                            pressure = item.pressure,
+                            previousLat = null,
+                            previousLon = null
+                        )
+                    }
+                }
+                isLoading(false)
+            }
+        } catch (e: Exception) {
+            Log.d("MyTag", "Ошибка: ${e.localizedMessage}")
+        } finally {
+            viewModelScope.launch {
+                isLoading(true)
+                delay(500L)
                 val cityName = weatherRepository.getCityName(geoRequest)
                 val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
                 weatherRepository.insertNote(weather, searchText)
-            }
-            val allWeatherUpdate = weatherRepository.getAllWeather(searchText)
-            Log.d("MyTag", "$allWeatherUpdate")
-            for (item in allWeatherUpdate) {
                 _state.update {
                     it.copy(
-                        city = item.name,
-                        temp = item.temp.roundToInt(),
-                        speed = item.speed,
-                        humidity = item.humidity,
-                        pressure = item.pressure,
+                        city = weather.name,
+                        temp = weather.temp.roundToInt(),
+                        speed = weather.speed,
+                        humidity = weather.humidity,
+                        pressure = weather.pressure,
                         previousLat = null,
                         previousLon = null
                     )
                 }
+                isLoading(false)
             }
-            isLoading(false)
         }
     }
 }
