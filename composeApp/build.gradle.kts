@@ -25,6 +25,8 @@ kotlin {
             implementation(libs.accompanist.permissions)
             implementation(libs.play.services.location)
             implementation(libs.kotlinx.coroutines.play.services)
+            implementation(libs.lottie.compose)
+            implementation(libs.navigation.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

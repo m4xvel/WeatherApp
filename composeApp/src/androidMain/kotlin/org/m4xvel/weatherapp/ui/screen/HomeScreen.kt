@@ -1,4 +1,4 @@
-package org.m4xvel.weatherapp.ui
+package org.m4xvel.weatherapp.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -38,11 +38,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import org.m4xvel.weatherapp.ui.MainViewModel
+import org.m4xvel.weatherapp.ui.animation.MonkeyAnimation
+import org.m4xvel.weatherapp.ui.animation.SwipeAnimation
 import org.m4xvel.weatherapp.ui.permissions.LocationPermissionButton
 
 @Composable
-fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
+fun HomeScreen(mainViewModel: MainViewModel = koinViewModel(), navController: NavController) {
     MaterialTheme {
         val state by mainViewModel.state.collectAsState()
         Column(
@@ -53,7 +57,12 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel()) {
             Search()
             if (state.loading) LoaderIndicator()
             LocationPermissionButton()
-            if (state.showCard) WeatherCard()
+            if (state.showCard) {
+                WeatherCard(navController = navController)
+                MonkeyAnimation(false)
+            } else {
+                MonkeyAnimation(true)
+            }
         }
     }
 }
@@ -114,7 +123,10 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
 }
 
 @Composable
-private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
+private fun WeatherCard(
+    mainViewModel: MainViewModel = koinViewModel(),
+    navController: NavController
+) {
 
     val state by mainViewModel.state.collectAsState()
 
@@ -143,6 +155,13 @@ private fun WeatherCard(mainViewModel: MainViewModel = koinViewModel()) {
                     AdditionalIntInformation("давление:", state.pressure, "mmHg")
                 }
             }
+        }
+        Column(
+            modifier = Modifier.fillMaxWidth(0.9f),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            if (state.showCard) SwipeAnimation(true, navController)
         }
     }
 }
