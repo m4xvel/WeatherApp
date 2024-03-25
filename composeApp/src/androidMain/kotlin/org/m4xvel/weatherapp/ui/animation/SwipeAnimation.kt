@@ -34,7 +34,11 @@ fun SwipeAnimation(value: Boolean = false, navController: NavController) {
                 detectHorizontalDragGestures { change, _ ->
                     positionList.add(change.position.component1().toDouble())
                     if (positionList.first() - positionList.last() > 100) {
-                        navController.navigate("DetailedWeatherScreen")
+                        navController.navigate("DetailedWeatherScreen") {
+                            popUpTo("HomeScreen") {
+                                inclusive = false
+                            }
+                        }
                     }
                 }
             },
