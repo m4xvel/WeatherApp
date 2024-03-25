@@ -1,6 +1,6 @@
 package org.m4xvel.weatherapp.domain.model
 
-data class CityName(
+data class LatAndLon(
     val lat: Double,
     val lon: Double
 )

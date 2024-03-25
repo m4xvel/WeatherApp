@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.data.repository.LocationProvider
+import org.m4xvel.weatherapp.domain.model.Weather
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
 import kotlin.math.roundToInt
 
@@ -100,17 +101,20 @@ class MainViewModel(
                         lastLocation.latitude,
                         lastLocation.longitude
                     )
-                    _state.update {
-                        it.copy(
-                            city = weather.name,
-                            temp = weather.temp.roundToInt(),
-                            speed = weather.speed,
-                            humidity = weather.humidity,
-                            pressure = weather.pressure,
-                            previousLat = lat,
-                            previousLon = lon,
-                            searchText = ""
-                        )
+                    val currentWeather: List<Weather> = listOf(weather.first())
+                    currentWeather.map { listItem ->
+                        _state.update {
+                            it.copy(
+                                city = listItem.name,
+                                temp = listItem.temp.roundToInt(),
+                                speed = listItem.speed,
+                                humidity = listItem.humidity,
+                                pressure = listItem.pressure,
+                                previousLat = lat,
+                                previousLon = lon,
+                                searchText = ""
+                            )
+                        }
                     }
                 }
                 isLoading(false)
@@ -121,7 +125,6 @@ class MainViewModel(
     private fun setDataApi(searchText: String) {
         viewModelScope.launch {
             val allWeather = weatherRepository.getAllWeather(searchText)
-            Log.d("MyTag", "$allWeather")
             for (item in allWeather) {
                 _state.update {
                     it.copy(
@@ -141,24 +144,28 @@ class MainViewModel(
             val allWeather = weatherRepository.getAllWeather(searchText)
             isLoading(true)
             delay(500L)
-            val cityName = weatherRepository.getCityName(geoRequest)
+            val cityName = weatherRepository.getLatAndLon(geoRequest)
             val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
-
+            val currentWeather: List<Weather> = listOf(weather.first())
             if (allWeather.isEmpty()) {
-                weatherRepository.insertNote(weather, searchText)
+                weatherRepository.insertNote(currentWeather, searchText)
             } else {
-                weatherRepository.updateWeather(weather, searchText)
+                weatherRepository.updateWeather(currentWeather, searchText)
             }
-            _state.update {
-                it.copy(
-                    city = weather.name,
-                    temp = weather.temp.roundToInt(),
-                    speed = weather.speed,
-                    humidity = weather.humidity,
-                    pressure = weather.pressure,
-                    previousLat = null,
-                    previousLon = null
-                )
+            currentWeather.map { listItem ->
+                Log.d("GetWeather", "$listItem")
+                _state.update {
+                    it.copy(
+                        city = listItem.name,
+                        temp = listItem.temp.roundToInt(),
+                        speed = listItem.speed,
+                        humidity = listItem.humidity,
+                        pressure = listItem.pressure,
+                        previousLat = null,
+                        previousLon = null,
+                        searchText = ""
+                    )
+                }
             }
             isLoading(false)
         }

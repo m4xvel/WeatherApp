@@ -1,12 +1,25 @@
 package org.m4xvel.weatherapp.data.remote
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class WeatherResponse(
-    val name: String,
+    val list: List<ListApi>,
+    val city: City
+)
+
+@Serializable
+data class ListApi(
     val wind: Wind,
-    val main: Main
+    val main: Main,
+    @SerialName("dt_txt")
+    val dtTxt: String
+)
+
+@Serializable
+data class City(
+    val name: String
 )
 
 @Serializable

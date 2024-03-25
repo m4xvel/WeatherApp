@@ -12,7 +12,7 @@ internal class RemoteDataSource(
         weatherService.getWeather(lat = lat, lon = lon)
     }
 
-    suspend fun getCityName(geoRequest: GeoRequest) = withContext(dispatcher.io) {
-        weatherService.getCityName(geoRequest = geoRequest)
+    suspend fun getLatAndLon(geoRequest: GeoRequest) = withContext(dispatcher.io) {
+        weatherService.getLatAndLon(geoRequest = geoRequest)
     }
 }
