@@ -1,5 +1,6 @@
 package org.m4xvel.weatherapp.ui
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,8 +15,11 @@ import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.data.repository.LocationProvider
 import org.m4xvel.weatherapp.domain.model.Weather
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import kotlin.math.roundToInt
 
+@SuppressLint("SimpleDateFormat")
 class MainViewModel(
     private val weatherRepository: WeatherRepository,
     private val locationProvider: LocationProvider
@@ -102,6 +106,7 @@ class MainViewModel(
                         lastLocation.longitude
                     )
                     val currentWeather: List<Weather> = listOf(weather.first())
+                    getDataTime(weather = weather)
                     currentWeather.map { listItem ->
                         _state.update {
                             it.copy(
@@ -147,6 +152,7 @@ class MainViewModel(
             val cityName = weatherRepository.getLatAndLon(geoRequest)
             val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
             val currentWeather: List<Weather> = listOf(weather.first())
+            getDataTime(weather = weather)
             if (allWeather.isEmpty()) {
                 weatherRepository.insertNote(currentWeather, searchText)
             } else {
@@ -169,6 +175,26 @@ class MainViewModel(
             }
             isLoading(false)
         }
+    }
+
+    private fun getDataTime(day: Int = 0, weather: List<Weather>) {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, day)
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        val data = sdf.format(calendar.time)
+
+        _state.update { it ->
+            it.copy(
+                morningWeather = weather.filter { it.time == "$data 09:00:00" },
+                duringTheDayWeather = weather.filter { it.time == "$data 12:00:00" },
+                inTheEveningWeather = weather.filter { it.time == "$data 15:00:00" },
+                nightWeather = weather.filter { it.time == "$data 18:00:00" }
+            )
+        }
+        Log.d(
+            "GetWeather",
+            "${state.value.morningWeather} \n${state.value.duringTheDayWeather} \n${state.value.inTheEveningWeather} \n${state.value.nightWeather}"
+        )
     }
 
     fun isPlayingAnimation(value: Boolean) {
