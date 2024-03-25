@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -129,7 +131,7 @@ private fun WeatherCard(
 ) {
 
     val state by mainViewModel.state.collectAsState()
-
+    val stateList by mainViewModel.stateList.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -137,7 +139,19 @@ private fun WeatherCard(
         Card(
             modifier = Modifier
                 .size(width = 600.dp, height = 250.dp)
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 10.dp)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, _ ->
+                        stateList.add(change.position.component1().toDouble())
+                        if (stateList.first() - stateList.last() > 100) {
+                            navController.navigate("DetailedWeatherScreen") {
+                                popUpTo("HomeScreen") {
+                                    inclusive = false
+                                }
+                            }
+                        }
+                    }
+                },
             shape = RoundedCornerShape(30.dp),
             border = BorderStroke(1.dp, Color.Black),
         ) {
@@ -161,7 +175,7 @@ private fun WeatherCard(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Bottom
         ) {
-            if (state.showCard) SwipeAnimation(true, navController)
+            if (state.showCard && state.showAnimation) SwipeAnimation()
         }
     }
 }

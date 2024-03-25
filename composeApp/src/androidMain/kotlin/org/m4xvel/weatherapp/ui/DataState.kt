@@ -11,6 +11,7 @@ data class DataState(
     val searchText: String = "",
     val previousSearchTextLength: Int = 0,
     val showButton: Boolean = false,
+    val showAnimation: Boolean = true,
     val showCard: Boolean = false,
     val loading: Boolean = false,
 )

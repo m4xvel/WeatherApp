@@ -25,6 +25,9 @@ class MainViewModel(
     private val _state = MutableStateFlow(DataState())
     val state: StateFlow<DataState> = _state.asStateFlow()
 
+    private val _stateList = MutableStateFlow(mutableListOf<Double>())
+    val stateList: StateFlow<MutableList<Double>> = _stateList.asStateFlow()
+
     private var waitInput: Job? = null
 
     fun setSearchText(text: String) {
@@ -159,5 +162,9 @@ class MainViewModel(
             }
             isLoading(false)
         }
+    }
+
+    fun isPlayingAnimation(value: Boolean) {
+        _state.update { it.copy(showAnimation = value) }
     }
 }
