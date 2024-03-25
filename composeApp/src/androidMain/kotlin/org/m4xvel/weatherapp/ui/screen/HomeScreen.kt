@@ -145,6 +145,7 @@ private fun WeatherCard(
                         stateList.add(change.position.component1().toDouble())
                         if (stateList.first() - stateList.last() > 100) {
                             navController.navigate("DetailedWeatherScreen") {
+                                mainViewModel.isPlayingAnimation(false)
                                 popUpTo("HomeScreen") {
                                     inclusive = false
                                 }

@@ -42,7 +42,7 @@ class MainViewModel(
 
             _state.update { it.copy(previousSearchTextLength = text.length) }
 
-            if (text.isEmpty()) _state.update { it.copy(loading = false) }
+            if (text.isEmpty()) isLoading(false)
 
             geoRequest = GeoRequest(text)
 
@@ -94,7 +94,7 @@ class MainViewModel(
             val lon = lastLocation?.longitude
 
             if (lat != _state.value.previousLat && lat != null) {
-                _state.update { it.copy(loading = true) }
+                isLoading(true)
                 viewModelScope.launch {
                     val weather = weatherRepository.getWeather(
                         lastLocation.latitude,

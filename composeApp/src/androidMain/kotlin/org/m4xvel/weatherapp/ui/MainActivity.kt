@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(navController = navController)
                     }
                     composable("DetailedWeatherScreen") {
-                        DetailedWeatherScreen()
+                        DetailedWeatherScreen(navController = navController)
                     }
                 }
             }
