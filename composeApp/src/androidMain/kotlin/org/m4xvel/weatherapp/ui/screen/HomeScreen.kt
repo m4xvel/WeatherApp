@@ -48,7 +48,7 @@ import org.m4xvel.weatherapp.ui.animation.SwipeAnimation
 import org.m4xvel.weatherapp.ui.permissions.LocationPermissionButton
 
 @Composable
-fun HomeScreen(mainViewModel: MainViewModel = koinViewModel(), navController: NavController) {
+fun HomeScreen(mainViewModel: MainViewModel, navController: NavController) {
     MaterialTheme {
         val state by mainViewModel.state.collectAsState()
         Column(
@@ -56,11 +56,11 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel(), navController: Na
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Search()
+            Search(mainViewModel = mainViewModel)
             if (state.loading) LoaderIndicator()
-            LocationPermissionButton()
+            LocationPermissionButton(mainViewModel = mainViewModel)
             if (state.showCard) {
-                WeatherCard(navController = navController)
+                WeatherCard(navController = navController, mainViewModel = mainViewModel)
                 MonkeyAnimation(false)
             } else {
                 MonkeyAnimation(true)
@@ -70,7 +70,7 @@ fun HomeScreen(mainViewModel: MainViewModel = koinViewModel(), navController: Na
 }
 
 @Composable
-private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
+private fun Search(mainViewModel: MainViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -126,7 +126,7 @@ private fun Search(mainViewModel: MainViewModel = koinViewModel()) {
 
 @Composable
 private fun WeatherCard(
-    mainViewModel: MainViewModel = koinViewModel(),
+    mainViewModel: MainViewModel,
     navController: NavController
 ) {
 

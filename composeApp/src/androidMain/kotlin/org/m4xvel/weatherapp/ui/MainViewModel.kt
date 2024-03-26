@@ -2,6 +2,8 @@ package org.m4xvel.weatherapp.ui
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -177,18 +179,24 @@ class MainViewModel(
         }
     }
 
-    private fun getDataTime(day: Int = 0, weather: List<Weather>) {
+    fun getDayTime(plusDay: Int): Int {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, day)
+        calendar.add(Calendar.DAY_OF_YEAR, plusDay)
+        val daySdf = SimpleDateFormat("dd")
+        return daySdf.format(calendar.time).toInt()
+    }
+
+    private fun getDataTime(weather: List<Weather>) {
+        val calendar = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         val data = sdf.format(calendar.time)
 
         _state.update { it ->
             it.copy(
-                morningWeather = weather.filter { it.time == "$data 09:00:00" },
+                morningWeather = weather.filter { it.time == "$data 06:00:00" },
                 duringTheDayWeather = weather.filter { it.time == "$data 12:00:00" },
-                inTheEveningWeather = weather.filter { it.time == "$data 15:00:00" },
-                nightWeather = weather.filter { it.time == "$data 18:00:00" }
+                inTheEveningWeather = weather.filter { it.time == "$data 18:00:00" },
+                nightWeather = weather.filter { it.time == "$data 21:00:00" }
             )
         }
         Log.d(
@@ -199,5 +207,12 @@ class MainViewModel(
 
     fun isPlayingAnimation(value: Boolean) {
         _state.update { it.copy(showAnimation = value) }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    fun toPage(pagerState: PagerState, iteration: Int) {
+        viewModelScope.launch {
+            pagerState.scrollToPage(iteration)
+        }
     }
 }

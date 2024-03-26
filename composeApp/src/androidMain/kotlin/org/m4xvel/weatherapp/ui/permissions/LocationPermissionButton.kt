@@ -24,7 +24,7 @@ import org.m4xvel.weatherapp.ui.MainViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun LocationPermissionButton(mainViewModel: MainViewModel = koinViewModel()) {
+fun LocationPermissionButton(mainViewModel: MainViewModel) {
 
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_COARSE_LOCATION

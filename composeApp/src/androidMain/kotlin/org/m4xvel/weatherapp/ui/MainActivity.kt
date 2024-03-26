@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
 import org.m4xvel.weatherapp.ui.screen.DetailedWeatherScreen
 import org.m4xvel.weatherapp.ui.screen.HomeScreen
 
@@ -19,6 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val mainViewModel: MainViewModel = koinViewModel()
             val timeEnter = 700
             val timeExit = 1200
             MaterialTheme {
@@ -51,10 +53,10 @@ class MainActivity : ComponentActivity() {
                     }
                 ) {
                     composable("HomeScreen") {
-                        HomeScreen(navController = navController)
+                        HomeScreen(navController = navController, mainViewModel = mainViewModel)
                     }
                     composable("DetailedWeatherScreen") {
-                        DetailedWeatherScreen(navController = navController)
+                        DetailedWeatherScreen(navController = navController, mainViewModel = mainViewModel)
                     }
                 }
             }
