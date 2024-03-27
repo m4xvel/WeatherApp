@@ -12,7 +12,8 @@ internal fun WeatherResponse.toWeather(): List<Weather> {
             speed = listItem.wind.speed,
             humidity = listItem.main.humidity,
             pressure = listItem.main.pressure,
-            dt = listItem.dt
+            dt = listItem.dt,
+            dtTxt = listItem.dtTxt
         )
     }
 }

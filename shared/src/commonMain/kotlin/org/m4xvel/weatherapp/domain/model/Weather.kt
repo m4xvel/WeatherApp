@@ -6,5 +6,6 @@ data class Weather(
     val speed: Double,
     val humidity: Long,
     val pressure: Long,
-    val dt: Long
+    val dt: Long,
+    val dtTxt: String
 )

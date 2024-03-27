@@ -110,9 +110,9 @@ private fun HorizontalPagerView(mainViewModel: MainViewModel) {
     HorizontalPager(
         modifier = Modifier.fillMaxSize(),
         state = pagerState
-    ) { iteration ->
+    ) { page ->
         Text(
-            text = "Page: $iteration"
+            text = "${ mainViewModel.getDayOfMonthForecast(page) }"
         )
     }
 }

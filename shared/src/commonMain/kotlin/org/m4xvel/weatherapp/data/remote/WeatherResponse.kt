@@ -13,7 +13,9 @@ internal data class WeatherResponse(
 data class ListApi(
     val wind: Wind,
     val main: Main,
-    val dt: Long
+    val dt: Long,
+    @SerialName("dt_txt")
+    val dtTxt: String
 )
 
 @Serializable
