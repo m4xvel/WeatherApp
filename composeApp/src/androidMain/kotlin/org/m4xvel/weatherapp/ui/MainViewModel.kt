@@ -17,8 +17,9 @@ import org.m4xvel.weatherapp.data.remote.geocoder.GeoRequest
 import org.m4xvel.weatherapp.data.repository.LocationProvider
 import org.m4xvel.weatherapp.domain.model.Weather
 import org.m4xvel.weatherapp.domain.repository.WeatherRepository
-import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
 import kotlin.math.roundToInt
 
 @SuppressLint("SimpleDateFormat")
@@ -34,6 +35,13 @@ class MainViewModel(
 
     private val _stateList = MutableStateFlow(mutableListOf<Double>())
     val stateList: StateFlow<MutableList<Double>> = _stateList.asStateFlow()
+
+    private val _daysOfMonth: MutableList<Int> = mutableListOf()
+    val daysOfMonth: MutableList<Int> = _daysOfMonth
+
+    private val _daysOfWeek: MutableList<String> = mutableListOf()
+    val daysOfWeek: MutableList<String> = _daysOfWeek
+
 
     private var waitInput: Job? = null
 
@@ -107,8 +115,8 @@ class MainViewModel(
                         lastLocation.latitude,
                         lastLocation.longitude
                     )
+                    getForecastByDay(weather)
                     val currentWeather: List<Weather> = listOf(weather.first())
-                    getDataTime(weather = weather)
                     currentWeather.map { listItem ->
                         _state.update {
                             it.copy(
@@ -154,7 +162,7 @@ class MainViewModel(
             val cityName = weatherRepository.getLatAndLon(geoRequest)
             val weather = weatherRepository.getWeather(cityName.lat, cityName.lon)
             val currentWeather: List<Weather> = listOf(weather.first())
-            getDataTime(weather = weather)
+            getForecastByDay(weather)
             if (allWeather.isEmpty()) {
                 weatherRepository.insertNote(currentWeather, searchText)
             } else {
@@ -179,30 +187,40 @@ class MainViewModel(
         }
     }
 
-    fun getDayTime(plusDay: Int): Int {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, plusDay)
-        val daySdf = SimpleDateFormat("dd")
-        return daySdf.format(calendar.time).toInt()
+    private fun getForecastByDay(weather: List<Weather>): Map<Int, List<Weather>> {
+        _daysOfMonth.clear()
+        val dailyForecast = weather
+            .groupBy {
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.time = Date(it.dt * 1000L)
+                calendar.get(Calendar.DAY_OF_MONTH)
+            }
+        _daysOfMonth.addAll(dailyForecast.keys)
+        return dailyForecast
     }
 
-    private fun getDataTime(weather: List<Weather>) {
-        val calendar = Calendar.getInstance()
-        val sdf = SimpleDateFormat("yyyy-MM-dd")
-        val data = sdf.format(calendar.time)
+    fun getDayOfMonth(iteration: Int): Int {
+        return _daysOfMonth.elementAt(iteration)
+    }
 
-        _state.update { it ->
-            it.copy(
-                morningWeather = weather.filter { it.time == "$data 06:00:00" },
-                duringTheDayWeather = weather.filter { it.time == "$data 12:00:00" },
-                inTheEveningWeather = weather.filter { it.time == "$data 18:00:00" },
-                nightWeather = weather.filter { it.time == "$data 21:00:00" }
-            )
+    fun getDayOfWeek(iteration: Int): String {
+        _daysOfWeek.clear()
+        for (day in _daysOfMonth) {
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.DAY_OF_MONTH] = day
+            val dayOfWeek = calendar[Calendar.DAY_OF_WEEK]
+            _daysOfWeek.add(when (dayOfWeek) {
+                Calendar.MONDAY -> "пн"
+                Calendar.TUESDAY -> "вт"
+                Calendar.WEDNESDAY -> "ср"
+                Calendar.THURSDAY -> "чт"
+                Calendar.FRIDAY -> "пт"
+                Calendar.SATURDAY -> "сб"
+                Calendar.SUNDAY -> "вс"
+                else -> "EXCEPTION"
+            })
         }
-        Log.d(
-            "GetWeather",
-            "${state.value.morningWeather} \n${state.value.duringTheDayWeather} \n${state.value.inTheEveningWeather} \n${state.value.nightWeather}"
-        )
+        return _daysOfWeek.elementAt(iteration)
     }
 
     fun isPlayingAnimation(value: Boolean) {

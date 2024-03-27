@@ -100,7 +100,7 @@ private fun HorizontalPagerView(mainViewModel: MainViewModel) {
                     },
             ) {
                 Text(
-                    text = "${ mainViewModel.getDayTime(iteration) }",
+                    text = "${ mainViewModel.getDayOfMonth(iteration) } ${ mainViewModel.getDayOfWeek(iteration) }",
                     color = textColor,
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
@@ -110,9 +110,9 @@ private fun HorizontalPagerView(mainViewModel: MainViewModel) {
     HorizontalPager(
         modifier = Modifier.fillMaxSize(),
         state = pagerState
-    ) { page ->
+    ) { iteration ->
         Text(
-            text = "Page: $page"
+            text = "Page: $iteration"
         )
     }
 }
