@@ -36,11 +36,11 @@ class MainViewModel(
     private val _stateList = MutableStateFlow(mutableListOf<Double>())
     val stateList: StateFlow<MutableList<Double>> = _stateList.asStateFlow()
 
-    private val _forecastByDay: MutableMap<Int, List<Weather>> = mutableMapOf()
-    val forecastByDay: MutableMap<Int, List<Weather>> = _forecastByDay
+    private val _daysOfMonth: MutableMap<Int, List<Weather>> = mutableMapOf()
+    val daysOfMonth: MutableMap<Int, List<Weather>> = _daysOfMonth
 
-    private val _daysOfWeek: MutableList<String> = mutableListOf()
-    val daysOfWeek: MutableList<String> = _daysOfWeek
+    private val _daysOfWeek: MutableList<Int> = mutableListOf()
+    val daysOfWeek: MutableList<Int> = _daysOfWeek
 
     private var waitInput: Job? = null
 
@@ -187,22 +187,43 @@ class MainViewModel(
     }
 
     private fun getForecastByDay(weather: List<Weather>) {
-        _forecastByDay.clear()
-        val dailyForecast = weather
+        _daysOfMonth.clear()
+        _daysOfWeek.clear()
+        val dailyForecastByMonth = weather
             .groupBy {
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
                 calendar.time = Date(it.dt * 1000L)
                 calendar.get(Calendar.DAY_OF_MONTH)
             }
-        _forecastByDay.putAll(dailyForecast)
+        val dailyForecastByWeek = weather
+            .groupBy {
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.time = Date(it.dt * 1000L)
+                calendar.get(Calendar.DAY_OF_WEEK)
+            }
+        _daysOfMonth.putAll(dailyForecastByMonth)
+        _daysOfWeek.addAll(dailyForecastByWeek.keys)
     }
 
     fun getDayOfMonth(iteration: Int): Int {
-        return _forecastByDay.keys.elementAt(iteration)
+        return _daysOfMonth.keys.elementAt(iteration)
+    }
+
+    fun getDayOfWeek(iteration: Int): String {
+        return when (_daysOfWeek.elementAt(iteration)) {
+            Calendar.MONDAY -> "пн"
+            Calendar.TUESDAY -> "вт"
+            Calendar.WEDNESDAY -> "ср"
+            Calendar.THURSDAY -> "чт"
+            Calendar.FRIDAY -> "пт"
+            Calendar.SATURDAY -> "сб"
+            Calendar.SUNDAY -> "вс"
+            else -> "EXCEPTION"
+        }
     }
 
     fun getDayOfMonthForecast(page: Int): Map<Int, List<Weather>>? {
-        val getDayOfMonthForecast = _forecastByDay.values.elementAt(page).groupBy {
+        val getDayOfMonthForecast = _daysOfMonth.values.elementAt(page).groupBy {
             val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
             calendar.time = Date(it.dt * 1000L)
             calendar.get(Calendar.HOUR_OF_DAY)
@@ -213,28 +234,6 @@ class MainViewModel(
         val evening = getDayOfMonthForecast.filter { it.key == 18 }
         val mainHoursInDay = night + morning + day + evening
         return mainHoursInDay.ifEmpty { null }
-    }
-
-    fun getDayOfWeek(iteration: Int): String {
-        _daysOfWeek.clear()
-        for (day in _forecastByDay) {
-            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-            calendar[Calendar.DAY_OF_MONTH] = day.key
-            val dayOfWeek = calendar[Calendar.DAY_OF_WEEK]
-            _daysOfWeek.add(
-                when (dayOfWeek) {
-                    Calendar.MONDAY -> "пн"
-                    Calendar.TUESDAY -> "вт"
-                    Calendar.WEDNESDAY -> "ср"
-                    Calendar.THURSDAY -> "чт"
-                    Calendar.FRIDAY -> "пт"
-                    Calendar.SATURDAY -> "сб"
-                    Calendar.SUNDAY -> "вс"
-                    else -> "EXCEPTION"
-                }
-            )
-        }
-        return _daysOfWeek.elementAt(iteration)
     }
 
     fun isPlayingAnimation(value: Boolean) {
